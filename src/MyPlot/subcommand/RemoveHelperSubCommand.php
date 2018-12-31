@@ -23,6 +23,7 @@ class RemoveHelperSubCommand extends SubCommand
 	 * @param string[] $args
 	 *
 	 * @return bool
+	 * @throws \ReflectionException
 	 */
 	public function execute(CommandSender $sender, array $args) : bool {
 		if(empty($args)) {
@@ -38,9 +39,8 @@ class RemoveHelperSubCommand extends SubCommand
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
 			return true;
 		}
-		$this->getPlugin()->getServer()->getPluginManager()->callEvent(
-			($ev = new MyPlotHelperEvent($this->getPlugin(), $sender->getName(), $plot, MyPlotHelperEvent::REMOVE, $helper->getName()))
-		);
+		$ev = new MyPlotHelperEvent($this->getPlugin(), $sender->getName(), $plot, MyPlotHelperEvent::REMOVE, $helper->getName());
+		$ev->call();
 		if($ev->isCancelled()) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("error"));
 			return true;

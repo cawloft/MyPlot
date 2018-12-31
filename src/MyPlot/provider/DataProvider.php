@@ -2,11 +2,13 @@
 declare(strict_types=1);
 namespace MyPlot\provider;
 
+use MyPlot\events\MyPlotSaveEvent;
 use MyPlot\MyPlot;
 use MyPlot\Plot;
 
-abstract class DataProvider
-{
+abstract class DataProvider {
+	/** @var int $type */
+	public $type = MyPlotSaveEvent::OTHER;
 	/** @var Plot[] $cache */
 	private $cache = [];
 	/** @var int $cacheSize */

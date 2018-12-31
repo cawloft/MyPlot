@@ -241,6 +241,8 @@ class EventListener implements Listener
 	 * @priority LOWEST
 	 *
 	 * @param PlayerMoveEvent $event
+	 *
+	 * @throws \ReflectionException
 	 */
 	public function onPlayerMove(PlayerMoveEvent $event) : void {
 		if($event->isCancelled()) {
@@ -255,13 +257,15 @@ class EventListener implements Listener
 		$plot = $this->plugin->getPlotByPosition($event->getTo());
 		$plotFrom = $this->plugin->getPlotByPosition($event->getFrom());
 		if($plot instanceof Plot and $plotFrom === null) {
-			$this->plugin->getServer()->getPluginManager()->callEvent($ev = new MyPlotPlayerEnterPlotEvent($this->plugin, $event->getPlayer()->getName(), $plot, $event->getPlayer()));
+			$ev = new MyPlotPlayerEnterPlotEvent($this->plugin, $event->getPlayer()->getName(), $plot, $event->getPlayer());
+			$ev->call();
 			if($ev->isCancelled()) {
 				$event->setCancelled();
 				return;
 			}
 		} elseif($plotFrom instanceof Plot and $plot === null) {
-			$this->plugin->getServer()->getPluginManager()->callEvent($ev = new MyPlotPlayerLeavePlotEvent($this->plugin, $event->getPlayer()->getName(), $plot, $event->getPlayer()));
+			$ev = new MyPlotPlayerLeavePlotEvent($this->plugin, $event->getPlayer()->getName(), $plot, $event->getPlayer());
+			$ev->call();
 			if($ev->isCancelled()) {
 				$event->setCancelled();
 				return;

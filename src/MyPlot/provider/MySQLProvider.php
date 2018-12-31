@@ -2,10 +2,13 @@
 declare(strict_types=1);
 namespace MyPlot\provider;
 
+use MyPlot\events\MyPlotSaveEvent;
 use MyPlot\MyPlot;
 use MyPlot\Plot;
 
 class MySQLProvider extends DataProvider {
+	/** @var int $type */
+	public $type = MyPlotSaveEvent::MySQL;
 	/** @var MyPlot $plugin */
 	protected $plugin;
 	/** @var \mysqli $db */

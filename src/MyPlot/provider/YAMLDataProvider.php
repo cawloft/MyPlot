@@ -2,11 +2,14 @@
 declare(strict_types=1);
 namespace MyPlot\provider;
 
+use MyPlot\events\MyPlotSaveEvent;
 use MyPlot\MyPlot;
 use MyPlot\Plot;
 use pocketmine\utils\Config;
 
 class YAMLDataProvider extends DataProvider {
+	/** @var int $type */
+	public $type = MyPlotSaveEvent::YAML;
 	/** @var MyPlot $plugin */
 	protected $plugin;
 	/** @var Config $yaml */

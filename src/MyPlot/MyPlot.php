@@ -163,9 +163,11 @@ class MyPlot extends PluginBase
 	 * @param Plot $plot
 	 *
 	 * @return bool
+	 * @throws \ReflectionException
 	 */
 	public function savePlot(Plot $plot) : bool {
-		$this->getServer()->getPluginManager()->callEvent(($ev = new MyPlotSaveEvent($this, "MyPlot", $this->dataProvider->type, $plot)));
+		$ev = new MyPlotSaveEvent($this, "MyPlot", $this->dataProvider->type, $plot);
+		$ev->call();
 		if($ev->isCancelled()) {
 			return false;
 		}

@@ -2,6 +2,7 @@
 declare(strict_types=1);
 namespace MyPlot\subcommand;
 
+use MyPlot\events\MyPlotBiomeChangeEvent;
 use pocketmine\command\CommandSender;
 use pocketmine\level\biome\Biome;
 use pocketmine\Player;
@@ -26,6 +27,7 @@ class BiomeSubCommand extends SubCommand
 	 * @param string[] $args
 	 *
 	 * @return bool
+	 * @throws \ReflectionException
 	 */
 	public function execute(CommandSender $sender, array $args) : bool {
 		if(empty($args)) {
@@ -62,9 +64,8 @@ class BiomeSubCommand extends SubCommand
 			}
 			$biome = Biome::getBiome($this->biomes[$biome]);
 		}
-		$this->getPlugin()->getServer()->getPluginManager()->callEvent(
-			($ev = new MyPlotBiomeChangeEvent($this->getPlugin(), $sender->getName(), $plot, $this->biomes[strtoupper($biome->getName())], $this->biomes[$plot->biome]))
-		);
+		$ev = new MyPlotBiomeChangeEvent($this->getPlugin(), $sender->getName(), $plot, $this->biomes[strtoupper($biome->getName())], $this->biomes[$plot->biome]);
+		$ev->call();
 		if($this->getPlugin()->setPlotBiome($ev->getPlot(), Biome::getBiome($ev->getNewBiomeId()))) {
 			$sender->sendMessage($this->translateString("biome.success", [$biome->getName()]));
 		}else{

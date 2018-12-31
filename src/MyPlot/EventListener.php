@@ -2,6 +2,8 @@
 declare(strict_types=1);
 namespace MyPlot;
 
+use MyPlot\events\MyPlotPlayerEnterPlotEvent;
+use MyPlot\events\MyPlotPlayerLeavePlotEvent;
 use pocketmine\block\Sapling;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockPlaceEvent;
@@ -251,7 +253,22 @@ class EventListener implements Listener
 			return;
 
 		$plot = $this->plugin->getPlotByPosition($event->getTo());
-		if($plot !== null and $plot !== $this->plugin->getPlotByPosition($event->getFrom())) {
+		$plotFrom = $this->plugin->getPlotByPosition($event->getFrom());
+		if($plot instanceof Plot and $plotFrom === null) {
+			$this->plugin->getServer()->getPluginManager()->callEvent($ev = new MyPlotPlayerEnterPlotEvent($this->plugin, $event->getPlayer()->getName(), $plot, $event->getPlayer()));
+			if($ev->isCancelled()) {
+				$event->setCancelled();
+				return;
+			}
+		} elseif($plotFrom instanceof Plot and $plot === null) {
+			$this->plugin->getServer()->getPluginManager()->callEvent($ev = new MyPlotPlayerLeavePlotEvent($this->plugin, $event->getPlayer()->getName(), $plot, $event->getPlayer()));
+			if($ev->isCancelled()) {
+				$event->setCancelled();
+				return;
+			}
+		}
+
+		if($plot !== null) {
 			if($plot->isDenied($event->getPlayer()->getName())) {
 				$event->setCancelled();
 				return;

@@ -2,6 +2,7 @@
 declare(strict_types=1);
 namespace MyPlot\subcommand;
 
+use MyPlot\events\MyPlotHelperEvent;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
@@ -35,6 +36,13 @@ class RemoveHelperSubCommand extends SubCommand
 		}
 		if($plot->owner !== $sender->getName() and !$sender->hasPermission("myplot.admin.removehelper")) {
 			$sender->sendMessage(TextFormat::RED . $this->translateString("notowner"));
+			return true;
+		}
+		$this->getPlugin()->getServer()->getPluginManager()->callEvent(
+			($ev = new MyPlotHelperEvent($this->getPlugin(), $sender->getName(), $plot, MyPlotHelperEvent::REMOVE, $helper->getName()))
+		);
+		if($ev->isCancelled()) {
+			$sender->sendMessage(TextFormat::RED . $this->translateString("error"));
 			return true;
 		}
 		if(!$plot->removeHelper($helper)) {

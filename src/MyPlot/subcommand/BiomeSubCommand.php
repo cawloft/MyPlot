@@ -62,7 +62,10 @@ class BiomeSubCommand extends SubCommand
 			}
 			$biome = Biome::getBiome($this->biomes[$biome]);
 		}
-		if($this->getPlugin()->setPlotBiome($plot, $biome)) {
+		$this->getPlugin()->getServer()->getPluginManager()->callEvent(
+			($ev = new MyPlotBiomeChangeEvent($this->getPlugin(), $sender->getName(), $plot, $this->biomes[strtoupper($biome->getName())], $this->biomes[$plot->biome]))
+		);
+		if($this->getPlugin()->setPlotBiome($ev->getPlot(), Biome::getBiome($ev->getNewBiomeId()))) {
 			$sender->sendMessage($this->translateString("biome.success", [$biome->getName()]));
 		}else{
 			$sender->sendMessage(TextFormat::RED . $this->translateString("error"));

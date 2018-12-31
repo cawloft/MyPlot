@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace MyPlot;
 
 use EssentialsPE\Loader;
+use MyPlot\events\MyPlotSaveEvent;
 use MyPlot\provider\DataProvider;
 use MyPlot\provider\EconomyProvider;
 use MyPlot\provider\EconomySProvider;
@@ -164,7 +165,11 @@ class MyPlot extends PluginBase
 	 * @return bool
 	 */
 	public function savePlot(Plot $plot) : bool {
-		return $this->dataProvider->savePlot($plot);
+		$this->getServer()->getPluginManager()->callEvent(($ev = new MyPlotSaveEvent($this, "MyPlot", $this->dataProvider->type, $plot)));
+		if($ev->isCancelled()) {
+			return false;
+		}
+		return $this->dataProvider->savePlot($ev->getPlot());
 	}
 
 	/**

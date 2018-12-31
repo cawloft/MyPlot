@@ -2,6 +2,7 @@
 declare(strict_types=1);
 namespace MyPlot\subcommand;
 
+use MyPlot\events\MyPlotClaimEvent;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
@@ -60,9 +61,14 @@ class ClaimSubCommand extends SubCommand
 			$sender->sendMessage(TextFormat::RED . $this->translateString("claim.nomoney"));
 			return true;
 		}
-		$plot->owner = $sender->getName();
-		$plot->name = $name;
-		if($this->getPlugin()->savePlot($plot)) {
+		$this->getPlugin()->getServer()->getPluginManager()->callEvent($ev = new MyPlotClaimEvent($this->getPlugin(), $sender->getName(), $plot, $player->getName()));
+		if($ev->isCancelled()) {
+			$sender->sendMessage(TextFormat::RED . $this->translateString("error"));
+			return true;
+		}
+		$ev->getPlot()->owner = $sender->getName();
+		$ev->getPlot()->name = $name;
+		if($this->getPlugin()->savePlot($ev->getPlot())) {
 			$sender->sendMessage($this->translateString("claim.success"));
 		}else{
 			$sender->sendMessage(TextFormat::RED . $this->translateString("error"));
